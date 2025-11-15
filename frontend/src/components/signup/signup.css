@@ -1,0 +1,32 @@
+.signuprow{
+    background-color: white;
+    border-radius: 30px;
+    box-shadow: 12px 12px 22px black;
+
+}
+.signupimg{
+    border-top-right-radius: 30px;
+    border-bottom-right-radius: 30px;
+}
+.btn3{
+    height:50px;
+    width:100%;
+}
+.btn3:hover{
+    background-color: white;
+    border: 1px solid black;
+    color: black;
+}
+.btn2{
+    border-radius: 50%;
+    background-color: white;
+    border: 1px solid #DB4437;
+    color: #DB4437;
+    
+}
+.btn2:hover{
+   
+    background-color: #DB4437;
+    border: none;
+    color: white;
+}

@@ -1,0 +1,32 @@
+.loginrow{
+    background-color: white;
+    border-radius: 30px;
+    box-shadow: 12px 12px 22px rgb(10, 53, 86);
+
+}
+.loginimg{
+    border-top-left-radius: 30px;
+    border-bottom-left-radius: 30px;
+}
+.btn1{
+    height:50px;
+    width:25%;
+}
+.btn1:hover{
+    background-color: white;
+    border: 1px solid black;
+    color: black;
+}
+.btn2{
+    border-radius: 50%;
+    background-color: white;
+    border: 1px solid #DB4437;
+    color: #DB4437;
+    
+}
+.btn2:hover{
+   
+    background-color: #DB4437;
+    border: none;
+    color: white;
+}
