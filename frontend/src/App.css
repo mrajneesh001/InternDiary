@@ -82,7 +82,7 @@ text-decoration: none;
 .navbar{
     width: 100%;
     display: flex;
-  
+    background: linear-gradient(-45deg, rgb(80, 160, 220), rgb(100, 150, 230));
     position: sticky;
     top: 0;
     z-index: 999;

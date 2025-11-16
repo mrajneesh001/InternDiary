@@ -1,6 +1,7 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState, useRef } from 'react'
 import offerContext from "../context/offers/offerContext"
 import studentOfferContext from "../context/studentoffers/studentOfferContext"
+import userContext from "../context/user/userContext"
 import { useLocation } from 'react-router-dom'
 import { toast } from 'react-custom-alert';
 import Newbadge from './Newbadge';
@@ -9,13 +10,18 @@ import Newbadge from './Newbadge';
 const Offeritem = (props) => {
     const context = useContext(offerContext);
     const studentcontext = useContext(studentOfferContext);
+    const usercontext = useContext(userContext);
     const { deleteOffer, addStudentToOffer } = context;
     const { addStudentOffer } = studentcontext;
+    const { editUser } = usercontext;
     const { offer, updateOffer, showApplicants} = props;
     const inidate=new Date();
     const[curdate,setCurdate]=useState(inidate)
     const [user, setUser] = useState();
     const [apply, setApply] = useState(false);
+    const [resumeFile, setResumeFile] = useState(null);
+    const resumeModalRef = useRef(null);
+    const resumeModalCloseRef = useRef(null);
  
     let location = useLocation();
 
@@ -63,6 +69,13 @@ const Offeritem = (props) => {
     const handleClick = async (e) => {
         e.preventDefault();
  
+        // Check if user has uploaded resume
+        if (!user || !user.resume) {
+            // Open modal to prompt user to upload resume
+            resumeModalRef.current.click();
+            return;
+        }
+
         addStudentOffer(offer.title, offer.description, offer.tag);
 
         if (user) {
@@ -72,6 +85,49 @@ const Offeritem = (props) => {
         else {
             toast.error("Invalid Credentials");
 
+        }
+    }
+
+    const handleResumeUpload = async (e) => {
+        const file = e.target.files[0];
+        if (file && file.type === 'application/pdf') {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                const base64 = reader.result;
+                setResumeFile(base64);
+            };
+            reader.readAsDataURL(file);
+        } else {
+            toast.error("Please upload a PDF file");
+        }
+    }
+
+    const handleResumeSubmit = async () => {
+        if (!resumeFile) {
+            toast.error("Please select a resume file");
+            return;
+        }
+
+        try {
+            // Update user profile with resume
+            await editUser(user.name, user.userType, user.profilepic, resumeFile);
+            
+            // Update local storage
+            const updatedUser = { ...user, resume: resumeFile };
+            localStorage.setItem('user', JSON.stringify(updatedUser));
+            setUser(updatedUser);
+            
+            // Close modal
+            resumeModalCloseRef.current.click();
+            
+            toast.success("Resume uploaded successfully!");
+            
+            // Now apply for the job
+            addStudentOffer(offer.title, offer.description, offer.tag);
+            addStudentToOffer(offer._id, (updatedUser.id || updatedUser._id), updatedUser.name, updatedUser.email, updatedUser.profilepic, updatedUser.resume);
+            toast.success("Applied Successfully");
+        } catch (error) {
+            toast.error("Failed to upload resume");
         }
     }
 
@@ -113,6 +169,39 @@ const Offeritem = (props) => {
             </div >
 
 
+
+            {/* Modal for resume upload */}
+            <button ref={resumeModalRef} type="button" className="btn btn-primary d-none" data-bs-toggle="modal" data-bs-target="#resumeUploadModal">
+                Upload Resume
+            </button>
+
+            <div className="modal fade" id="resumeUploadModal" tabIndex="-1" aria-labelledby="resumeUploadModalLabel" aria-hidden="true">
+                <div className="modal-dialog">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h1 className="modal-title fs-5" id="resumeUploadModalLabel">Upload Resume to Apply</h1>
+                            <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" ref={resumeModalCloseRef}></button>
+                        </div>
+                        <div className="modal-body">
+                            <p>You need to upload your resume before applying for this position.</p>
+                            <div className="mb-3">
+                                <label htmlFor="resumeUpload" className="form-label">Select Resume (PDF only)</label>
+                                <input 
+                                    type="file" 
+                                    className="form-control" 
+                                    id="resumeUpload" 
+                                    accept=".pdf" 
+                                    onChange={handleResumeUpload}
+                                />
+                            </div>
+                        </div>
+                        <div className="modal-footer">
+                            <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="button" className="btn btn-primary" onClick={handleResumeSubmit}>Upload & Apply</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             {/* //  modal for deletion */}
             <div className="modal fade" id="deletionmodal" tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">

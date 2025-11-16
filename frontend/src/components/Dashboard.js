@@ -9,6 +9,11 @@ import UserContext from '../context/user/userContext';
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-custom-alert';
 import Navbar from './Navbar';
+import { Document, Page } from 'react-pdf';
+import { pdfjs } from 'react-pdf';
+import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
+import 'react-pdf/dist/esm/Page/TextLayer.css';
+pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
 
 
 const Dashboard = (props) => {
@@ -27,6 +32,22 @@ const Dashboard = (props) => {
   const ref = useRef(null)
   const refClose = useRef(null)
   const usertyperef = useRef(null);
+  const pdfModalRef = useRef(null);
+  const [numPages, setNumPages] = useState(null);
+  const [pageNumber, setPageNumber] = useState(1);
+
+  function onDocumentLoadSuccess({ numPages }) {
+    setNumPages(numPages);
+    setPageNumber(1);
+  }
+
+  const viewResume = () => {
+    if (euser.resume) {
+      pdfModalRef.current.click();
+    } else {
+      toast.error("No resume uploaded");
+    }
+  };
 
 
   function convertToBase64(file) {
@@ -45,8 +66,18 @@ const Dashboard = (props) => {
   useEffect(() => {
 
     const asyncFn = async () => {
-      setUser(JSON.parse(localStorage.getItem('user')));
-
+      const userData = JSON.parse(localStorage.getItem('user'));
+      if (userData) {
+        setUser({
+          id: userData.id || userData._id || "",
+          name: userData.name || "",
+          email: userData.email || "",
+          userType: userData.userType || "",
+          profilepic: userData.profilepic || "",
+          resume: userData.resume || "",
+          datecreated: userData.datecreated || ""
+        });
+      }
     };
 
     if (localStorage.getItem('firstTime') === "true") {
@@ -91,7 +122,15 @@ const Dashboard = (props) => {
     e.preventDefault();
     let currentUser = JSON.parse(localStorage.getItem('user'))
 
-    setUser({ id: currentUser.id || currentUser._id, name: currentUser.name, userType: currentUser.userType, email: currentUser.email, profilepic: currentUser.profilepic })
+    setUser({ 
+      id: currentUser.id || currentUser._id, 
+      name: currentUser.name, 
+      userType: currentUser.userType, 
+      email: currentUser.email, 
+      profilepic: currentUser.profilepic || "",
+      resume: currentUser.resume || "",
+      datecreated: currentUser.datecreated || ""
+    })
 
   }
 
@@ -114,6 +153,10 @@ const Dashboard = (props) => {
   }
   const onChangepic = async (e) => {
     const file = e.target.files[0];
+    
+    if (!file) {
+      return;
+    }
 
     const filesize = file.size / 1024
     if (filesize > 5120) {
@@ -131,6 +174,11 @@ const Dashboard = (props) => {
   }
   const onChangeresume = async (e) => {
     const file = e.target.files[0];
+    
+    if (!file) {
+      return;
+    }
+    
     const filesize = file.size / 1024
     if (filesize > 5120) {
       toast.warning("File size is less than 5mb")
@@ -170,7 +218,12 @@ const Dashboard = (props) => {
                           </div>
                         </div>
                       </div>
-                      <input type="file" className="form-control" id="profilepic" name="profilepic" accept='.jpeg, .png, .jpg' aria-describedby="emailHelp" onChange={onChangepic} />
+                      <div className='d-flex justify-content-center'>
+                        <input type="file" className="form-control d-none" id="profilepic" name="profilepic" accept='.jpeg, .png, .jpg' aria-describedby="emailHelp" onChange={onChangepic} />
+                        <label htmlFor="profilepic" className="form-label my-2 mb-0">
+                          <span className='btn btn-primary'>{euser.profilepic ? 'Update Profile Picture' : 'Add Profile Picture'}</span>
+                        </label>
+                      </div>
 
                     </div>
                     <div className="right my-5">
@@ -181,9 +234,11 @@ const Dashboard = (props) => {
 
                       </div>
                       <div className="mb-3">
-
-                        <input type="file" className="form-control" id="resume" name="resume" accept='.pdf' aria-describedby="emailHelp" onChange={onChangeresume} />
-                        <label htmlFor="resume" className="form-label  my-2"><button className='btn btn-primary' disabled>Resume</button></label>
+                        <input type="file" className="form-control d-none" id="resume" name="resume" accept='.pdf' aria-describedby="emailHelp" onChange={onChangeresume} />
+                        <label htmlFor="resume" className="form-label my-2 mb-0">
+                          <span className='btn btn-primary'>{euser.resume ? 'Update Resume' : 'Add Resume'}</span>
+                        </label>
+                        {euser.resume && <button type="button" className='btn btn-outline-primary ms-2' onClick={viewResume}>View Resume</button>}
                       </div>
                     </div>
                   </div>
@@ -221,10 +276,46 @@ const Dashboard = (props) => {
         </div>
       </div>
 
+      {/* Resume Viewer Modal */}
+      <button ref={pdfModalRef} type="button" className="btn btn-primary d-none" data-bs-toggle="modal" data-bs-target="#resumeViewModal">
+        View Resume
+      </button>
 
-
-
-
+      <div className="modal fade" id="resumeViewModal" tabIndex="-1" aria-labelledby="resumeViewModalLabel" aria-hidden="true">
+        <div className="modal-dialog modal-fullscreen">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h1 className="modal-title fs-2" id="resumeViewModalLabel">Your Resume</h1>
+              <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div className="modal-body d-flex flex-column align-items-center">
+              <Document file={euser.resume} onLoadSuccess={onDocumentLoadSuccess}>
+                <Page pageNumber={pageNumber} />
+              </Document>
+              <div className="mt-3">
+                <button 
+                  className="btn btn-secondary me-2" 
+                  onClick={() => setPageNumber(prev => Math.max(1, prev - 1))}
+                  disabled={pageNumber <= 1}
+                >
+                  Previous
+                </button>
+                <span className="mx-3">Page {pageNumber} of {numPages}</span>
+                <button 
+                  className="btn btn-secondary ms-2" 
+                  onClick={() => setPageNumber(prev => Math.min(numPages, prev + 1))}
+                  disabled={pageNumber >= numPages}
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+            <div className="modal-footer">
+              <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <div className='dashboard'>
         <div className='sideprofile'>
