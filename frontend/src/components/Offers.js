@@ -116,9 +116,10 @@ const Offers = (props) => {
                         {offers.length === 0 && 'No offers to display'}
                     </div>
                     {
-                        offers.map((off) => {
+                        Array.isArray(offers) && offers.map((off) => {
                             return <Offeritem key={off._id} updateOffer={updateOffer} offer={off} />
-                        })}
+                        })
+                    }
 
                 </>}
             </div>

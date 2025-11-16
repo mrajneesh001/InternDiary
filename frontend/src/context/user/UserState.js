@@ -2,7 +2,7 @@ import UserContext from "./userContext";
 import { useState } from "react";
 
 const UserState = (props) => {
-  const host = "http://localhost:5000"
+  const host = process.env.REACT_APP_BACKEND_API;
 
 const [user, setUser] = useState()
   // Edit a Offer

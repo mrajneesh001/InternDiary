@@ -9,13 +9,14 @@ import { useGoogleLogin } from '@react-oauth/google';
 const Signup = (props) => {
     const [credentials, setCredentials] = useState({ name: "", email: "", password: "", userType: "" })
     const [usertype, setUsertype] = useState("Student");
-    const [isGoogleLoading, setIsGoogleLoading] = useState(false)
+    const [isLoading, setIsLoading] = useState(false);
+    const [, setIsGoogleLoading] = useState(false);
     const navigate = useNavigate();
     const handleSubmit = async (e) => {
         e.preventDefault();
         const { name, email, password } = credentials;
         const userType = usertype;
-        const response = await fetch("http://localhost:5000/api/auth/createuser", {
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_API}/api/auth/createuser`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

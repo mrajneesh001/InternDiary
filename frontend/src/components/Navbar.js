@@ -78,8 +78,8 @@ const Navbar = () => {
 
                         </ul>
                         {!localStorage.getItem('token') ? <form className="d-flex">
-                            <Link className="btn btn-primary mx-1" to="/login" role="button">Login</Link>
-                            <Link className="btn btn-primary mx-1" to="/signup" role="button">Signup</Link>
+                            {location.pathname !== "/login" && <Link className="btn btn-primary mx-1" to="/login" role="button">Login</Link>}
+                            {location.pathname !== "/signup" && <Link className="btn btn-primary mx-1" to="/signup" role="button">Signup</Link>}
                         </form> :  <section><img src={user?.profilepic || avatar }className="nav-avatar mx-2" alt="..."/> <button type="button" className="btn btn-primary" data-bs-toggle="modal" data-bs-target="#logout">
                             Logout
                         </button></section>}

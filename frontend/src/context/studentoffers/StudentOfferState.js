@@ -2,7 +2,7 @@ import StudentOfferContext from "./studentOfferContext";
 import { useState } from "react";
 
 const StudentOfferState = (props) => {
-  const host = "http://localhost:5000"
+  const host = process.env.REACT_APP_BACKEND_API;
   const notesInitial = []
   const [studentoffers, setStudentOffers] = useState(notesInitial)
 

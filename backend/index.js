@@ -6,7 +6,7 @@ const dotenv = require("dotenv").config();
 const bodyParser = require("body-parser");
 
 const app = express()
-const port = 5000
+const port = process.env.PORT || 5000;
 
 // Connect to MongoDB before starting server
 connectToMongo();
@@ -24,6 +24,6 @@ app.use('/api/offers', require('./routes/offers'))
 app.use('/api/studentoffers', require('./routes/studentoffers'))
 
 
-app.listen(port, () => {
+app.listen(port, '0.0.0.0', () => {
   console.log(`InternDiary backend listening at http://localhost:${port}`)
 })

@@ -2,7 +2,7 @@ import OfferContext from "./offerContext";
 import { useState } from "react";
 
 const OfferState = (props) => {
-  const host = "http://localhost:5000"
+  const host = process.env.REACT_APP_BACKEND_API;
   const offersInitial = []
   const [offers, setOffers] = useState(offersInitial)
 
@@ -60,7 +60,8 @@ const OfferState = (props) => {
         "auth-token": localStorage.getItem('token')
       }
     });
-    const json = response.json();
+    // eslint-disable-next-line no-unused-vars
+    const json = await response.json();
     const newOffers = offers.filter((offer) => { return offer._id !== id })
     setOffers(newOffers)
   }
@@ -78,6 +79,9 @@ const OfferState = (props) => {
     });
 
     const json = await response.json();
+    // The line above is kept for potential future use, but is currently unused.
+    // You can uncomment the line below and remove the one above if you want to disable the eslint warning.
+    // const _ = await response.json();
 
     let newOffers = JSON.parse(JSON.stringify(offers))
     // Logic to edit in client
