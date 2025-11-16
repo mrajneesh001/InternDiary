@@ -7,10 +7,10 @@ import "./signup.css"
 
 import { useGoogleLogin } from '@react-oauth/google';
 const Signup = (props) => {
-    const [credentials, setCredentials] = useState({ name: "", email: "", password: "", userType: "" })
-    const [usertype, setUsertype] = useState("Student");
-    const [isLoading, setIsLoading] = useState(false);
-    const [, setIsGoogleLoading] = useState(false);
+    const [credentials, setCredentials] = useState({ name: "", email: "", password: "", cpassword: "" })
+    const [usertype, setUsertype] = useState("student");
+    // eslint-disable-next-line no-unused-vars
+    const [isGoogleLoading, setIsGoogleLoading] = useState(false);
     const navigate = useNavigate();
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -88,11 +88,6 @@ const Signup = (props) => {
         console.error("Google OAuth error details:", error);
         const errorMessage = error?.error || error?.error_description || "Google login failed";
         toast.error(`Google login error: ${errorMessage}`);
-    }
-    
-    const handleGoogleLoginClick = () => {
-        setIsGoogleLoading(true);
-        login();
     }
     
     const login = useGoogleLogin({ 

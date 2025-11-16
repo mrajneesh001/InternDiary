@@ -61,6 +61,7 @@ const OfferState = (props) => {
       }
     });
     // eslint-disable-next-line no-unused-vars
+    // eslint-disable-next-line no-unused-vars
     const json = await response.json();
     const newOffers = offers.filter((offer) => { return offer._id !== id })
     setOffers(newOffers)
@@ -78,10 +79,8 @@ const OfferState = (props) => {
       body: JSON.stringify({ title, description, tag })
     });
 
+    // eslint-disable-next-line no-unused-vars
     const json = await response.json();
-    // The line above is kept for potential future use, but is currently unused.
-    // You can uncomment the line below and remove the one above if you want to disable the eslint warning.
-    // const _ = await response.json();
 
     let newOffers = JSON.parse(JSON.stringify(offers))
     // Logic to edit in client

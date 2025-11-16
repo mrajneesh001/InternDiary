@@ -90,10 +90,11 @@ const AlumOffers = () => {
 
     }
     const [numPages, setNumPages] = useState(null);
-    const [pageNumber, ] = useState(0);
+    const [pageNumber, setPageNumber] = useState(1);
 
     function onDocumentLoadSuccess({ numPages }) {
         setNumPages(numPages);
+        setPageNumber(1);
     }
 
     return (

@@ -1,8 +1,7 @@
 import './App.css';
 import {
   Routes,
-  Route,
-  useNavigate
+  Route
 } from "react-router-dom";
 
 import { Home } from './components/Home';
@@ -13,12 +12,9 @@ import StudentOfferState from './context/studentoffers/StudentOfferState';
 import UserState from './context/user/UserState';
 import Signup from './components/signup/Signup';
 import Login from './components/login/Login';
-import { useState } from 'react';
 import Dashboard from './components/Dashboard';
 
 function App() {
-
-  const navigate = useNavigate();
 
   return (
     <>
